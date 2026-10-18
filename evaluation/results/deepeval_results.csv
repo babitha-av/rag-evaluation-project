@@ -1,0 +1,3 @@
+question,faithfulness,faithfulness_reason,answer_relevancy,answer_relevancy_reason
+How long is the refund period?,0.0,The score is 0.00 because there are no contradictions in the actual output to justify a higher faithfulness score.,1.0,"The score is 1.00 because there are no irrelevant statements in the actual output, making it a perfect answer that directly addresses the input question."
+Does AcmeAI support multi-factor authentication?,0.0,The score is 0.00 because there are no contradictions in the actual output to justify a higher faithfulness score.,1.0,"The score is 1.00 because there are no irrelevant statements in the actual output, making it a perfect score."
