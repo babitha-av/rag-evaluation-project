@@ -21,7 +21,33 @@ python evaluation/quality_gate.py
 
 This project builds a lightweight retrieval-augmented generation (RAG) pipeline over a small knowledge base and evaluates the answers against a labeled dataset.
 
-It uses:
+### Architecture overview
+
+```mermaid
+flowchart LR
+    Docs[Knowledge base\nMarkdown / text docs] --> Ingest[Ingest & chunk\napp/ingest.py]
+    Ingest --> Chroma[Vector store\nChroma / data/chroma]
+    Chroma --> Rag[RAG pipeline\napp/rag_pipeline.py]
+    Rag --> LLM[LLM runtime\nOllama / llama3.2]
+    Rag --> Context[Retrieved context]
+
+    Dataset[Evaluation dataset\ndata/evaluation_dataset.csv] --> Eval[Run evaluation\nevaluation/run_evaluation.py]
+    Eval --> Outputs[Generated outputs\nrag_outputs.csv]
+    Outputs --> Deterministic[Deterministic checks]
+    Outputs --> Ragas[RAGAS metrics]
+    Outputs --> Deepeval[DeepEval metrics]
+
+    Deterministic --> Gate[Quality gate\nevaluation/quality_gate.py]
+    Ragas --> Gate
+    Deepeval --> Gate
+```
+
+### Stack
+
+- LangChain + Chroma for document ingestion and vector retrieval
+- Ollama for embeddings and LLM inference
+- CSV-based evaluation dataset for prompt/answer testing
+- deterministic checks plus RAGAS and DeepEval scoring for quality assessment
 - LangChain + Chroma for document ingestion and vector retrieval
 - Ollama for embeddings and LLM inference
 - a CSV-based evaluation dataset for prompt/answer testing
