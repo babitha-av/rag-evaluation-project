@@ -48,7 +48,8 @@ def answer_contains_refusal(answer):
 
     # A response that starts with an affirmative claim is not a refusal,
     # even if it later notes that the context is incomplete.
-    first_word = normalized_answer.split(maxsplit=1)[0].strip(".,!?;:") if normalized_answer else ""
+    first_word = normalized_answer.split(maxsplit=1)[0].strip(
+        ".,!?;:") if normalized_answer else ""
     if first_word == "yes":
         return False
 
