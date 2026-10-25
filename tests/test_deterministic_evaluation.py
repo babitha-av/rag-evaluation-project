@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from evaluation.deterministic_checks import evaluate_row
+from evaluation.deterministic_checks import answer_contains_refusal, evaluate_row
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,10 +19,27 @@ def load_rag_results():
 # They are intentionally tracked as expected failures.
 KNOWN_FAILURES = {
     "TC007": "Retrieval failure: security.md was not retrieved.",
+    "TC009": "Unsupported answer: claims mobile app access without evidence.",
     "TC015": "Reasoning failure: refund eligibility after 20 days.",
     "TC016": "Ambiguity handling failure: model answered without clarification.",
     "TC021": "Reasoning failure: refund eligibility after 20 days.",
 }
+
+
+@pytest.mark.parametrize(
+    ("answer", "expected"),
+    [
+        ("No, the context does not mention Apple Pay.", True),
+        ("No, the context does not provide information on phone support.", True),
+        ("I can't fulfill this request.", True),
+        (
+            "Yes, the context does not mention a mobile app, but users can access the web app.",
+            False,
+        ),
+    ],
+)
+def test_answer_contains_refusal(answer, expected):
+    assert answer_contains_refusal(answer) is expected
 
 
 @pytest.mark.parametrize(

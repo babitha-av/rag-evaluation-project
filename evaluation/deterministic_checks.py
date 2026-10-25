@@ -44,19 +44,34 @@ def answer_contains_refusal(answer):
     Detect whether the model appropriately refuses to answer
     when information is unavailable.
     """
+    normalized_answer = normalize(answer)
+
+    # A response that starts with an affirmative claim is not a refusal,
+    # even if it later notes that the context is incomplete.
+    first_word = normalized_answer.split(maxsplit=1)[0].strip(".,!?;:") if normalized_answer else ""
+    if first_word == "yes":
+        return False
+
     refusal_phrases = [
         "i don't have enough information",
         "i do not have enough information",
         "i don't have enough information to answer",
         "i cannot answer",
         "i can't answer",
+        "i can't fulfill this request",
+        "i cannot fulfill this request",
         "not enough information",
         "information is not available",
         "i don't have information",
         "i do not have information",
+        "the context does not mention",
+        "the provided context does not mention",
+        "provided context does not mention",
+        "the context does not provide information",
+        "the context does not provide information on",
     ]
 
-    return contains_any(answer, refusal_phrases)
+    return contains_any(normalized_answer, refusal_phrases)
 
 
 # -------------------------------------------------------------------
