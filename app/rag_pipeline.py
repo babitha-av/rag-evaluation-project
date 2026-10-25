@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from langchain_chroma import Chroma
@@ -29,9 +30,28 @@ class RAGPipeline:
             search_kwargs={"k": 3}
         )
 
+    def _expand_query(self, question):
+        """Add known domain synonyms to improve retrieval."""
+        normalized = question.lower()
+
+        if "mfa" in normalized:
+            return (
+                f"{question} multi-factor authentication "
+                "account security settings enable"
+            )
+
+        if "multi-factor authentication" in normalized:
+            return (
+                f"{question} MFA account security settings enable"
+            )
+
+        return question
+
     def ask(self, question):
 
-        documents = self.retriever.invoke(question)
+        # Improve retrieval for known terminology variants.
+        retrieval_query = self._expand_query(question)
+        documents = self.retriever.invoke(retrieval_query)
 
         context = "\n\n".join(
             document.page_content
@@ -39,20 +59,43 @@ class RAGPipeline:
         )
 
         prompt = f"""
-You are a helpful question-answering assistant.
+You are a helpful question-answering assistant for AcmeAI.
 
-Answer the user's question using ONLY the provided context.
+Use ONLY the provided context to answer factual questions.
+Do not invent facts or assume that missing information is true.
 
-If the answer cannot be found in the context, say:
+POLICY REASONING:
+- Identify applicable eligibility rules, deadlines, and limits.
+- Compare the user's stated situation with those conditions.
+- Apply the stated conditions before deciding eligibility.
+- Do not confuse a policy's eligibility window with a general
+  processing time.
+ANSWERING AND ABSTENTION:
+- First, check whether the provided context contains the facts
+  needed to answer the question.
+- If the context directly answers the question, answer clearly
+  using those facts.
+- If the question describes a scenario, apply the relevant
+  conditions and limits in the context to that scenario.
+- Do not abstain merely because the answer requires a simple
+  comparison or inference from facts explicitly stated in the context.
+- Abstain only when the information needed to answer is genuinely
+  absent from the context.
+- Never invent facts that are not supported by the context.
 
-"I don't have enough information to answer that."
-
-Do not make up information.
+AMBIGUITY:
+- If the user asks for a price but does not specify which plan,
+  and multiple plans are available in the context, ask which
+  plan they mean instead of listing all plan prices.
+- Ask a concise clarifying question when essential information
+  is missing.
+- Do not ask for clarification when the context and question
+  already provide enough information to answer.
 
 Context:
 {context}
 
-Question:
+Original user question:
 {question}
 
 Answer:

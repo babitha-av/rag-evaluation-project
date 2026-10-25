@@ -1,24 +1,5 @@
 # RAG Evaluation Project
 
-## Quick start
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-ollama pull llama3.2
-ollama pull nomic-embed-text
-ollama pull qwen2.5:7b
-
-python app/ingest.py
-python evaluation/run_evaluation.py
-python evaluation/deterministic_checks.py
-python evaluation/ragas_evaluator.py
-python evaluation/deepeval_evaluator.py
-python evaluation/quality_gate.py
-```
-
 This project builds a lightweight retrieval-augmented generation (RAG) pipeline over a small knowledge base and evaluates the answers against a labeled dataset.
 
 ### Architecture overview
@@ -45,13 +26,10 @@ flowchart LR
 ### Stack
 
 - LangChain + Chroma for document ingestion and vector retrieval
-- Ollama for embeddings and LLM inference
 - CSV-based evaluation dataset for prompt/answer testing
 - deterministic checks plus RAGAS and DeepEval scoring for quality assessment
-- LangChain + Chroma for document ingestion and vector retrieval
-- Ollama for embeddings and LLM inference
-- a CSV-based evaluation dataset for prompt/answer testing
-- deterministic checks and RAGAS/DeepEval-style scoring for quality assessment
+-- Ollama for embeddings and LLM inference
+
 
 The project expects the following local Ollama models to be available:
 - `llama3.2` for the main RAG pipeline and DeepEval judge
